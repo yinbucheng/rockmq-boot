@@ -44,3 +44,16 @@ create_time datetime,
 update_time datetime,
 remark varchar(255)
 )engine=innodb;
+
+
+create table if not exists ad_stock_log(
+`id` bigint primary key auto_increment,
+`item_id` bigint,
+`amount` int,
+`user_id` bigint,
+`update_time` datetime,
+`create_time` datetime,
+`status` int,
+`promo_id` bigint,
+`remark` varchar(255)
+)engine=innodb;

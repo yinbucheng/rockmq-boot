@@ -12,4 +12,8 @@ import com.baomidou.mybatisplus.service.IService;
  */
 public interface OrderService  extends IService<OrderEntity> {
     void createOrder(Long itemId,Long userId,Integer amount,Integer price,Long promoId);
+
+    void createNewOrder(Long itemId,Long userId,Integer amount,Long promoId);
+
+    void doCreateNewOrder(Long itemId,Long userId,Integer amount,Long promoId,Long stockLogId);
 }

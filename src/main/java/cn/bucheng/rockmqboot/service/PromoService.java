@@ -11,4 +11,5 @@ import com.baomidou.mybatisplus.service.IService;
  * @version:
  */
 public interface PromoService extends IService<PromoEntity> {
+    void pushPromo(long promoId);
 }
