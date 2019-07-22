@@ -4,4 +4,8 @@
     <update id="decrementStock">
          update imooc_order.ad_item_stock set stock = stock - #{amount} where id =#{itemStockId} and stock >= #{amount};
     </update>
+
+    <update id="decrementStockByItemId">
+        update imooc_order.ad_item_stock set stock = stock -#{amount} where item_id = #{itemid} and stock >=#{amount}
+    </update>
 </mapper>
