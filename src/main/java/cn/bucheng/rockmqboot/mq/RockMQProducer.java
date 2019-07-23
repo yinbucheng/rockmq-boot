@@ -5,6 +5,7 @@ import cn.bucheng.rockmqboot.entity.StockLogEntity;
 import cn.bucheng.rockmqboot.mapper.StockLogMapper;
 import cn.bucheng.rockmqboot.service.OrderService;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
 import org.apache.rocketmq.client.producer.TransactionListener;
@@ -29,6 +30,7 @@ import java.util.Map;
  * @version:
  */
 @Component
+@Slf4j
 public class RockMQProducer {
 
     private TransactionMQProducer transactionMQProducer;
@@ -60,6 +62,7 @@ public class RockMQProducer {
                     orderService.doCreateNewOrder(itemId, userId, amount, promoId, stockLogId);
                     return LocalTransactionState.COMMIT_MESSAGE;
                 } catch (Exception e) {
+                    log.error(e.toString());
                     return LocalTransactionState.ROLLBACK_MESSAGE;
                 }
             }

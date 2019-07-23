@@ -170,7 +170,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         if (ObjectUtils.isEmpty(promoEntity)) {
             throw new BusinessException(BusinessError.CAN_NOT_FIND_RECORD.getMessage());
         }
-
+        
         //减掉redis缓存中的数据
         Long count = redisTemplate.opsForHash().increment(PromoRedisConstant.PROMO_ITEM_STOCK, PromoRedisConstant.ITEM_KEY + itemId, -amount);
         if (count < 0) {
