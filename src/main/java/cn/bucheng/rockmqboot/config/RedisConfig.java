@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * @modified By：
  * @version:
  */
-@Configuration
+//@Configuration
 @EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600)
 public class RedisConfig {
 

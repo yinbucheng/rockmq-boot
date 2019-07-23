@@ -13,6 +13,7 @@ import cn.bucheng.rockmqboot.service.CacheService;
 import cn.bucheng.rockmqboot.service.ItemService;
 import cn.bucheng.rockmqboot.vo.ItemModel;
 import cn.bucheng.rockmqboot.vo.PromoModel;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
@@ -44,7 +45,7 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, ItemEntity> impleme
     @Autowired
     private ItemStockMapper itemStockMapper;
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private CacheService cacheService;
 
@@ -59,9 +60,10 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, ItemEntity> impleme
         if (!Objects.isNull(item_data)) {
             return item_data;
         }
-        item_data = (ItemModel) redisTemplate.opsForValue().get("item_data_" + id);
+        String item_data_str = redisTemplate.opsForValue().get("item_data_" + id);
         if (!Objects.isNull(item_data)) {
             cacheService.setCommonCache("item_data_" + id, item_data);
+            item_data = JSON.parseObject(item_data_str, ItemModel.class);
             return item_data;
         }
         ItemModel model = new ItemModel();
@@ -98,7 +100,7 @@ public class ItemServiceImpl extends ServiceImpl<ItemMapper, ItemEntity> impleme
             model.setPromoModel(promoModel);
         }
         //保存数据到redis中,并设置超时时间
-        redisTemplate.opsForValue().set("item_data_" + id, model, 120, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("item_data_" + id, JSON.toJSONString(model), 120, TimeUnit.SECONDS);
         cacheService.setCommonCache("item_data_" + id, model);
         return model;
     }

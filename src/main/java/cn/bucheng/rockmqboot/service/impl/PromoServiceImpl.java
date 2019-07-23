@@ -30,7 +30,7 @@ public class PromoServiceImpl extends ServiceImpl<PromoMapper, PromoEntity> impl
     @Autowired
     private ItemStockMapper itemStockMapper;
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,String> redisTemplate;
 
     @Override
     public void pushPromo(long promoId) {
@@ -50,6 +50,6 @@ public class PromoServiceImpl extends ServiceImpl<PromoMapper, PromoEntity> impl
         //清除掉售空标记
         redisTemplate.opsForHash().delete(PromoRedisConstant.PROMO_SOLD_OUT, PromoRedisConstant.ITEM_KEY + promoEntity.getItemId());
         //将商品的库存数量存放到redis中
-        redisTemplate.opsForHash().put(PromoRedisConstant.PROMO_ITEM_STOCK, PromoRedisConstant.ITEM_KEY + promoEntity.getItemId(), stockNum);
+        redisTemplate.opsForHash().put(PromoRedisConstant.PROMO_ITEM_STOCK, PromoRedisConstant.ITEM_KEY + promoEntity.getItemId(), stockNum+"");
     }
 }

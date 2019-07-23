@@ -42,7 +42,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Autowired
     private ItemStockMapper itemStockMapper;
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,String> redisTemplate;
     @Autowired
     private StockLogMapper stockLogMapper;
     @Autowired
@@ -151,7 +151,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
                 } else {
                     stockLogEntity.setStatus(StockLogConstant.ROLLBACK);
                 }
-                stockLogMapper.insert(stockLogEntity);
+                stockLogMapper.updateById(stockLogEntity);
             }
         });
 
@@ -170,7 +170,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         if (ObjectUtils.isEmpty(promoEntity)) {
             throw new BusinessException(BusinessError.CAN_NOT_FIND_RECORD.getMessage());
         }
-        
+
         //减掉redis缓存中的数据
         Long count = redisTemplate.opsForHash().increment(PromoRedisConstant.PROMO_ITEM_STOCK, PromoRedisConstant.ITEM_KEY + itemId, -amount);
         if (count < 0) {
@@ -202,6 +202,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         stockLogEntity.setUserId(userId);
         stockLogEntity.setStatus(StockLogConstant.WAIT_EXECUTE);
         stockLogEntity.setPromoId(promoId);
+        stockLogEntity.setUpdateTime(new Date());
+        stockLogEntity.setCreateTime(new Date());
         stockLogMapper.insert(stockLogEntity);
         return stockLogEntity.getId();
     }

@@ -3,6 +3,7 @@ package cn.bucheng.rockmqboot.mq;
 import cn.bucheng.rockmqboot.mapper.ItemMapper;
 import cn.bucheng.rockmqboot.mapper.ItemStockMapper;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @version:
  */
 @Component
+@Slf4j
 public class RockMQConsumer {
 
     private DefaultMQPushConsumer consumer;
@@ -53,7 +55,8 @@ public class RockMQConsumer {
                 Map<String, Object> map = JSON.parseObject(content, Map.class);
                 long itemId = (long) map.get("itemId");
                 int amount = (int) map.get("amount");
-                int row = itemStockMapper.decrementStockByItemId(itemId, amount);
+                log.info("==========get message from producer========itemId:"+itemId+" amount:"+amount);
+                itemStockMapper.decrementStockByItemId(itemId, amount);
                 itemMapper.incrementSales(itemId, amount);
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
