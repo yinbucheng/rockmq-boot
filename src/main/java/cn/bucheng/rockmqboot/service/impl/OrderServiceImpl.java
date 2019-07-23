@@ -7,7 +7,9 @@ import cn.bucheng.rockmqboot.exception.BusinessError;
 import cn.bucheng.rockmqboot.exception.BusinessException;
 import cn.bucheng.rockmqboot.mapper.*;
 import cn.bucheng.rockmqboot.mq.RockMQProducer;
+import cn.bucheng.rockmqboot.service.ItemService;
 import cn.bucheng.rockmqboot.service.OrderService;
+import cn.bucheng.rockmqboot.vo.ItemModel;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +42,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     private PromoMapper promoMapper;
 
     @Autowired
+    private ItemService itemService;
+
+    @Autowired
     private ItemStockMapper itemStockMapper;
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private StockLogMapper stockLogMapper;
     @Autowired
@@ -115,6 +120,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Override
     @Transactional
     public void createNewOrder(Long itemId, Long userId, Integer amount, Long promoId) {
+        //获取是否已经售空
+        Object soldFlag = redisTemplate.opsForHash().get(PromoRedisConstant.PROMO_SOLD_OUT, PromoRedisConstant.ITEM_KEY + itemId);
+        if (!ObjectUtils.isEmpty(soldFlag)) {
+            throw new BusinessException(BusinessError.NO_AVAILABLE_RECORD.getMessage());
+        }
         //加入库存流水
         long stockLogId = insertStockLogRecord(itemId, userId, amount, promoId);
         //发送消息到rockmq中
@@ -155,14 +165,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             }
         });
 
-        //获取是否已经售空
-        Object soldFlag = redisTemplate.opsForHash().get(PromoRedisConstant.PROMO_SOLD_OUT, PromoRedisConstant.ITEM_KEY + itemId);
-        if (!ObjectUtils.isEmpty(soldFlag)) {
-            throw new BusinessException(BusinessError.NO_AVAILABLE_RECORD.getMessage());
-        }
-
-        ItemEntity itemEntity = itemMapper.selectById(itemId);
-        if (ObjectUtils.isEmpty(itemEntity)) {
+        ItemModel itemModel = itemService.findItem(itemId);
+//        ItemEntity itemEntity = itemMapper.selectById(itemId);
+        if (ObjectUtils.isEmpty(itemModel)) {
             throw new BusinessException(BusinessError.CAN_NOT_FIND_RECORD.getMessage());
         }
 
@@ -186,7 +191,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         entity.setId(traceId);
         entity.setAmount(amount);
         entity.setItemId(itemId);
-        entity.setItemPrice(itemEntity.getPrice());
+        entity.setItemPrice(itemModel.getPrice());
         entity.setOrderPrice(promoEntity.getPromoItemPrice());
         entity.setUserId(userId);
         entity.setPromoId(promoId);
