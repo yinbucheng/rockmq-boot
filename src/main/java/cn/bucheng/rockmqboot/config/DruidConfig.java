@@ -2,6 +2,7 @@ package cn.bucheng.rockmqboot.config;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,12 +17,12 @@ public class DruidConfig {
 
     @Bean
     @SuppressWarnings("all")
-    public ServletRegistrationBean druidServlet() {
+    public ServletRegistrationBean druidServlet(@Value("${spring.datasource.druid.username}") String username, @Value("${spring.datasource.druid.password}") String password) {
 
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
         //登录查看信息的账号密码.
-        servletRegistrationBean.addInitParameter("loginUsername", "admin");
-        servletRegistrationBean.addInitParameter("loginPassword", "admin");
+        servletRegistrationBean.addInitParameter("loginUsername", username);
+        servletRegistrationBean.addInitParameter("loginPassword", password);
         return servletRegistrationBean;
     }
 
