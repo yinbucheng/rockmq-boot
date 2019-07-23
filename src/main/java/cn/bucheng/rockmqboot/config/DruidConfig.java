@@ -17,7 +17,7 @@ public class DruidConfig {
 
     @Bean
     @SuppressWarnings("all")
-    public ServletRegistrationBean druidServlet(@Value("${spring.datasource.druid.username}") String username, @Value("${spring.datasource.druid.password}") String password) {
+    public ServletRegistrationBean druidServlet(@Value("${spring.datasource.druid.stat-view-servlet.login-username}") String username, @Value("${spring.datasource.druid.stat-view-servlet.login-password}") String password) {
 
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
         //登录查看信息的账号密码.
