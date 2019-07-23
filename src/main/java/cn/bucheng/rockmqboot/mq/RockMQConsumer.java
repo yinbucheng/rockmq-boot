@@ -28,6 +28,7 @@ import java.util.Map;
  */
 @Component
 @Slf4j
+@SuppressWarnings("all")
 public class RockMQConsumer {
 
     private DefaultMQPushConsumer consumer;
