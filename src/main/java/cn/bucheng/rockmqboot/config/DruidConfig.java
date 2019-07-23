@@ -7,10 +7,12 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 访问地址 http://你的服务器ip地址:端口/druid/index.html
+ */
 @Configuration
 @SuppressWarnings("all")
 public class DruidConfig {
-
 
     @Bean
     @SuppressWarnings("all")
