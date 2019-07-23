@@ -112,7 +112,7 @@ public class RockMQProducer {
             }
             return false;
         } catch (MQClientException e) {
-            e.printStackTrace();
+            log.error(e.toString());
             throw new RuntimeException(e);
         }
     }

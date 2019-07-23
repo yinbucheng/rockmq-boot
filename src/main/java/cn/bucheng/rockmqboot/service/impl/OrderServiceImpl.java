@@ -57,7 +57,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Override
     @Transactional
     public void createOrder(Long itemId, Long userId, Integer amount, Integer price, Long promoId) {
-
         //获取是否已经售空
         Object soldFlag = redisTemplate.opsForHash().get(PromoRedisConstant.PROMO_SOLD_OUT, PromoRedisConstant.ITEM_KEY + itemId);
         if (!ObjectUtils.isEmpty(soldFlag)) {
@@ -120,11 +119,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
     @Override
     @Transactional
     public void createNewOrder(Long itemId, Long userId, Integer amount, Long promoId) {
-        //获取是否已经售空
-        Object soldFlag = redisTemplate.opsForHash().get(PromoRedisConstant.PROMO_SOLD_OUT, PromoRedisConstant.ITEM_KEY + itemId);
-        if (!ObjectUtils.isEmpty(soldFlag)) {
-            throw new BusinessException(BusinessError.NO_AVAILABLE_RECORD.getMessage());
-        }
         //加入库存流水
         long stockLogId = insertStockLogRecord(itemId, userId, amount, promoId);
         //发送消息到rockmq中
@@ -140,7 +134,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
 
         StockLogEntity stockLogEntity = stockLogMapper.selectById(stockLogId);
         if (null == stockLogEntity) {
-            throw new BusinessException(BusinessError.NO_AVAILABLE_RECORD.getMessage());
+            throw new BusinessException(BusinessError.CAN_NOT_FIND_RECORD.getMessage());
         }
         //添加事务执行拦截
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
