@@ -166,10 +166,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         });
 
         ItemModel itemModel = itemService.findItem(itemId);
-//        ItemEntity itemEntity = itemMapper.selectById(itemId);
+//        ItemEntity itemModel = itemMapper.selectById(itemId);
         if (ObjectUtils.isEmpty(itemModel)) {
             throw new BusinessException(BusinessError.CAN_NOT_FIND_RECORD.getMessage());
         }
+
 
         PromoEntity promoEntity = promoMapper.selectById(promoId);
         if (ObjectUtils.isEmpty(promoEntity)) {
