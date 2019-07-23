@@ -53,11 +53,11 @@ public class RockMQConsumer {
                 Message msg = list.get(0);
                 String content = new String(msg.getBody());
                 Map<String, Object> map = JSON.parseObject(content, Map.class);
-                long itemId = (long) map.get("itemId");
+                long itemId = Long.parseLong(map.get("itemId")+"");
                 int amount = (int) map.get("amount");
-                log.info("==========get message from producer========itemId:"+itemId+" amount:"+amount);
-                itemStockMapper.decrementStockByItemId(itemId, amount);
-                itemMapper.incrementSales(itemId, amount);
+                log.info("==========get message from producer========itemId:" + itemId + " amount:" + amount);
+                int row = itemStockMapper.decrementStockByItemId(itemId, amount);
+                 row = itemMapper.incrementSales(itemId, amount);
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });

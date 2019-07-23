@@ -52,6 +52,7 @@ public class RockMQProducer {
         transactionMQProducer.setTransactionListener(new TransactionListener() {
             @Override
             public LocalTransactionState executeLocalTransaction(Message message, Object arg) {
+                log.info("=======execute local transaction======");
                 Map<String, Object> argMap = (Map<String, Object>) arg;
                 long itemId = (long) argMap.get("itemId");
                 int amount = (int) argMap.get("amount");
@@ -69,6 +70,7 @@ public class RockMQProducer {
 
             @Override
             public LocalTransactionState checkLocalTransaction(MessageExt messageExt) {
+                log.info("=========check local transaction============");
                 String content = new String(messageExt.getBody());
                 Map arg = JSON.parseObject(content, Map.class);
                 long stockLogId = (long) arg.get("stockLogId");
