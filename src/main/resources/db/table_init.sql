@@ -20,6 +20,8 @@ create table if not exists ad_item_stock (
 `remark` varchar(255)
 )engine=innodb;
 
+alter table ad_item_stock add index index_item_id (item_id);
+
 create table if not exists ad_order (
 `id` varchar(255) primary key ,
 `user_id` bigint,
@@ -45,6 +47,7 @@ update_time datetime,
 remark varchar(255)
 )engine=innodb;
 
+alter table ad_promo add index index_item_id (item_id);
 
 create table if not exists ad_stock_log(
 `id` bigint primary key auto_increment,
