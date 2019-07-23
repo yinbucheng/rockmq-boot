@@ -21,7 +21,8 @@ public enum BusinessError {
     EXECUTE_SQL_FAIL(5003, "未能成功执行sql语句"),
     NO_AVAILABLE_RECORD(5004,"没有可用的数据"),
     NO_AVAILABLE_OPERATION(5005,"无效操作"),
-    UNKNOW_ERROR(5006,"未知错误"),
+    UNKNOWN_ERROR(5006,"未知错误"),
+    PLACE_ORDER_FAIL(5007,"下单失败"),
     ;
     private int code;
     private String message;

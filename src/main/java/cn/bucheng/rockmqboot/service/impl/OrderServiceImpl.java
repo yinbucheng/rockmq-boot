@@ -124,7 +124,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         //发送消息到rockmq中
         boolean flag = rockMQProducer.txAsyncReduceStock(itemId, userId, promoId, amount, stockLogId);
         if (!flag) {
-            throw new BusinessException(BusinessError.UNKNOW_ERROR.getMessage());
+            throw new BusinessException(BusinessError.PLACE_ORDER_FAIL.getMessage());
         }
     }
 

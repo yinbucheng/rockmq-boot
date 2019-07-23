@@ -17,7 +17,7 @@ public class RockmqBootApplicationTests {
 
     @BeforeClass
     public static void initProperties(){
-        System.setProperty("spring.profiles.active","fat");
+        System.setProperty("spring.profiles.active","dev");
     }
 
     @Test
