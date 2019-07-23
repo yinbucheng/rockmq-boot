@@ -50,15 +50,26 @@ public class RockMQConsumer {
         consumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> list, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
-                Message msg = list.get(0);
-                String content = new String(msg.getBody());
-                Map<String, Object> map = JSON.parseObject(content, Map.class);
-                long itemId = Long.parseLong(map.get("itemId")+"");
-                int amount = (int) map.get("amount");
-                log.info("==========get message from producer========itemId:" + itemId + " amount:" + amount);
-                int row = itemStockMapper.decrementStockByItemId(itemId, amount);
-                 row = itemMapper.incrementSales(itemId, amount);
-                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+                try {
+                    Message msg = list.get(0);
+                    String content = new String(msg.getBody());
+                    Map<String, Object> map = JSON.parseObject(content, Map.class);
+                    long itemId = Long.parseLong(map.get("itemId") + "");
+                    int amount = (int) map.get("amount");
+                    log.info("==========get message from producer========itemId:" + itemId + " amount:" + amount);
+                    int row = itemStockMapper.decrementStockByItemId(itemId, amount);
+                    if (row <= 0) {
+                        return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                    }
+                    row = itemMapper.incrementSales(itemId, amount);
+                    if (row <= 0) {
+                        return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                    }
+                    return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+                } catch (Exception e) {
+                    log.error(e.toString());
+                    return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                }
             }
         });
 
