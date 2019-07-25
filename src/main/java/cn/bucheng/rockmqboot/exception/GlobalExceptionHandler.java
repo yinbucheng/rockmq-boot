@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({Exception.class, Throwable.class})
     @ResponseBody
-    public ServerResult doError(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Exception ex) {
+    public ServerResult doError(HttpServletRequest req, HttpServletResponse resp, Exception ex) {
         log.error(ex.toString());
         if (ex instanceof BusinessException) {
             BusinessException businessException = (BusinessException) ex;
