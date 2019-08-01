@@ -58,7 +58,7 @@ public class RockMQConsumer {
                     Map<String, Object> map = JSON.parseObject(content, Map.class);
                     long itemId = Long.parseLong(map.get("itemId") + "");
                     int amount = (int) map.get("amount");
-                    log.info("==========get message from producer========itemId:" + itemId + " amount:" + amount);
+                    log.info("recevie message from producer itemId:{}, amount:{}", itemId, amount);
                     int row = itemStockMapper.decrementStockByItemId(itemId, amount);
                     if (row <= 0) {
                         throw new BusinessException("更新失败");
@@ -70,7 +70,7 @@ public class RockMQConsumer {
                     return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
                 } catch (Exception e) {
                     int time = msg.getReconsumeTimes();
-                    if(time>=4) {
+                    if (time >= 4) {
                         log.error("retry consumer message,number:{}", time);
                         log.error(e.toString());
                     }
