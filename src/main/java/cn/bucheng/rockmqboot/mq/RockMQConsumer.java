@@ -1,5 +1,6 @@
 package cn.bucheng.rockmqboot.mq;
 
+import cn.bucheng.rockmqboot.exception.BusinessException;
 import cn.bucheng.rockmqboot.mapper.ItemMapper;
 import cn.bucheng.rockmqboot.mapper.ItemStockMapper;
 import com.alibaba.fastjson.JSON;
@@ -51,8 +52,8 @@ public class RockMQConsumer {
         consumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> list, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
+                MessageExt msg = list.get(0);
                 try {
-                    Message msg = list.get(0);
                     String content = new String(msg.getBody());
                     Map<String, Object> map = JSON.parseObject(content, Map.class);
                     long itemId = Long.parseLong(map.get("itemId") + "");
@@ -60,15 +61,19 @@ public class RockMQConsumer {
                     log.info("==========get message from producer========itemId:" + itemId + " amount:" + amount);
                     int row = itemStockMapper.decrementStockByItemId(itemId, amount);
                     if (row <= 0) {
-                        return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                        throw new BusinessException("更新失败");
                     }
                     row = itemMapper.incrementSales(itemId, amount);
                     if (row <= 0) {
-                        return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                        throw new BusinessException("更新失败");
                     }
                     return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
                 } catch (Exception e) {
-                    log.error(e.toString());
+                    int time = msg.getReconsumeTimes();
+                    if(time>=4) {
+                        log.error("retry consumer message,number:{}", time);
+                        log.error(e.toString());
+                    }
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
             }
