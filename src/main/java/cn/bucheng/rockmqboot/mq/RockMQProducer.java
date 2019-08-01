@@ -33,6 +33,8 @@ import java.util.Map;
 @Slf4j
 public class RockMQProducer {
 
+    private static final int MAX_EXECUTE_NUMBER = 20;
+
     private TransactionMQProducer transactionMQProducer;
     @Value("${mq.nameserver.addr}")
     private String nameAddr;
@@ -79,6 +81,15 @@ public class RockMQProducer {
                     return LocalTransactionState.UNKNOW;
                 }
                 if (stockLogEntity.getStatus() == StockLogConstant.WAIT_EXECUTE) {
+                    if (stockLogEntity.getExecuteNum() > MAX_EXECUTE_NUMBER) {
+                        return LocalTransactionState.ROLLBACK_MESSAGE;
+                    }
+                    int executeNum = stockLogEntity.getExecuteNum() + 1;
+                    stockLogEntity.setExecuteNum(executeNum);
+                    Integer rows = stockLogMapper.updateById(stockLogEntity);
+                    if (rows <= 0) {
+                        log.error("update stockLog fail,stockLogID:{}", stockLogId);
+                    }
                     return LocalTransactionState.UNKNOW;
                 } else if (stockLogEntity.getStatus() == StockLogConstant.COMMIT) {
                     return LocalTransactionState.COMMIT_MESSAGE;

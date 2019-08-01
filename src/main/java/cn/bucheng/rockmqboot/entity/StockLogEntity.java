@@ -36,4 +36,5 @@ public class StockLogEntity extends BaseEntity implements Serializable {
 
     private Long promoId;
 
+    private Integer executeNum;
 }

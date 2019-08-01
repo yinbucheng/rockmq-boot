@@ -56,7 +56,8 @@ create table if not exists ad_stock_log(
 `user_id` bigint,
 `update_time` datetime,
 `create_time` datetime,
-`status` int,
+`status` int not null default 0 comment `0 等待执行 2执行成功 -2执行失败`,
 `promo_id` bigint,
+execute_num int not null default 0,
 `remark` varchar(255)
 )engine=innodb;

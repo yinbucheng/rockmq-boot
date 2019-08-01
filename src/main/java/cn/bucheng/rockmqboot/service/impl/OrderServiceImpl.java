@@ -149,18 +149,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             public void afterCompletion(int status) {
                 //status 0 表示成功 1表示回滚
                 super.afterCompletion(status);
-                stockLogEntity.setUpdateTime(new Date());
                 if (status == 0) {
-                    stockLogEntity.setStatus(StockLogConstant.COMMIT);
+                    int row = stockLogMapper.updateStatusById(stockLogId, StockLogConstant.COMMIT);
+                    if(row<=0){
+                        log.error("execute order success but fail to update stockLogRecord status to commit ,stockLogId:{}",stockLogId);
+                    }
                 } else {
-                    stockLogEntity.setStatus(StockLogConstant.ROLLBACK);
+                   int row =  stockLogMapper.updateStatusById(stockLogId, StockLogConstant.ROLLBACK);
+                    if(row<=0){
+                        log.error("execute order success but fail to update stockLogRecord status to rollback ,stockLogId:{}",stockLogId);
+                    }
                 }
-                stockLogMapper.updateById(stockLogEntity);
             }
         });
 
         ItemModel itemModel = itemService.findItem(itemId);
-//        ItemEntity itemModel = itemMapper.selectById(itemId);
         if (ObjectUtils.isEmpty(itemModel)) {
             throw new BusinessException(BusinessError.CAN_NOT_FIND_RECORD.getMessage());
         }
