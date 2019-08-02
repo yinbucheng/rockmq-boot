@@ -6,11 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @Slf4j
-public class RockmqBootApplication {
+public class BootApplication {
 
     public static void main(String[] args) {
         log.info("begain start application");
-        SpringApplication.run(RockmqBootApplication.class, args);
+        SpringApplication.run(BootApplication.class, args);
     }
 
 }
